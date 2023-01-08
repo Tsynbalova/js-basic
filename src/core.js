@@ -59,7 +59,7 @@ function fibonacci(n) {
  * console.log(sumFn(3)) - 18
  */
 function getOperationFn(initialValue, operatorFn) {
-    if (operatorFn !== undefined) {
+    if (operatorFn) {
         const res = function (value) {
             return (initialValue = operatorFn(initialValue, value));
         };
@@ -108,34 +108,31 @@ function sequence(start = 0, step = 1) {
  * deepEqual({arr: [22, 33], text: 'text'}, {arr: [22, 3], text: 'text2'}) // false
  */
 function deepEqual(firstObject, secondObject) {
-    if (typeof firstObject !== typeof secondObject) {
-        return false;
-    }
-
-    const prortyArray1 = Object.getOwnPropertyNames(firstObject);
-    const prortyArray2 = Object.getOwnPropertyNames(secondObject);
-
-    if (prortyArray1.length !== prortyArray2.length) {
-        return false;
-    } else if (prortyArray1.length === 0) {
-        return Object.is(firstObject, secondObject);
-    } else {
-        for (let i = 0; i < prortyArray1.length; i++) {
-            const temp = prortyArray1[i];
-            const flag =
-                typeof firstObject[temp] === 'object' &&
-                typeof secondObject[temp] === 'object' &&
-                firstObject[temp] !== null;
-
-            if (
-                (!flag && firstObject[temp] !== secondObject[temp]) ||
-                (flag && !deepEqual(firstObject[temp], secondObject[temp]))
-            )
-                return false;
+    if (
+        (typeof firstObject !== 'object' && typeof secondObject !== 'object') ||
+        firstObject === null ||
+        secondObject === null
+    ) {
+        return (
+            firstObject === secondObject ||
+            (typeof secondObject === 'number' &&
+                typeof firstObject === 'number' &&
+                isNaN(firstObject) &&
+                isNaN(secondObject))
+        );
+    } else if (
+        typeof firstObject === 'object' &&
+        typeof secondObject === 'object' &&
+        Object.keys(firstObject).length === Object.keys(secondObject).length
+    ) {
+        let isEquals = true;
+        for (const el in firstObject) {
+            isEquals = deepEqual(firstObject[el], secondObject[el]);
+            if (!isEquals) return false;
         }
-
         return true;
     }
+    return false;
 }
 
 module.exports = {
